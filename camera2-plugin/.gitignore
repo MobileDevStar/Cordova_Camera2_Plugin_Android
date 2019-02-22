@@ -1,0 +1,10 @@
+.idea
+.DS_Store
+/www/dist/
+platforms/
+plugins/
+bin/
+gen/
+node_modules/
+yarn-error.log
+

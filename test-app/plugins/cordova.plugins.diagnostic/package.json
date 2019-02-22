@@ -1,0 +1,86 @@
+{
+  "_from": "cordova.plugins.diagnostic@4.0.11",
+  "_id": "cordova.plugins.diagnostic@4.0.11",
+  "_inBundle": false,
+  "_integrity": "sha512-mH0T96bKk4NysY/g8KVUfHvHYbTNlexFdqeuPCsBXFwVE5IbUG3LFYVkNJkJCfrGCVg8JrRNIxPTs6W4EsxcUQ==",
+  "_location": "/cordova.plugins.diagnostic",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "cordova.plugins.diagnostic@4.0.11",
+    "name": "cordova.plugins.diagnostic",
+    "escapedName": "cordova.plugins.diagnostic",
+    "rawSpec": "4.0.11",
+    "saveSpec": null,
+    "fetchSpec": "4.0.11"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova.plugins.diagnostic/-/cordova.plugins.diagnostic-4.0.11.tgz",
+  "_shasum": "ffbb355f2a66d50dfb385538b577e480714e8133",
+  "_spec": "cordova.plugins.diagnostic@4.0.11",
+  "_where": "D:\\Cordova\\test-app",
+  "author": {
+    "name": "Dave Alden"
+  },
+  "bugs": {
+    "url": "https://github.com/dpa99c/cordova-diagnostic-plugin/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova.plugins.diagnostic",
+    "platforms": [
+      "android",
+      "ios",
+      "windows"
+    ]
+  },
+  "cordova_name": "Diagnostic",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "elementtree": "^0.1.6",
+    "minimist": "1.2.0"
+  },
+  "deprecated": false,
+  "description": "Cordova/Phonegap plugin to check the state of Location/WiFi/Camera/Bluetooth device settings.",
+  "engines": {
+    "cordovaDependencies": {
+      "4.0.0": {
+        "cordova": ">=7.1.0",
+        "cordova-android": ">=6.3.0",
+        "cordova-ios": ">=4.3.0"
+      }
+    }
+  },
+  "homepage": "https://github.com/dpa99c/cordova-diagnostic-plugin#readme",
+  "issue": "https://github.com/dpa99c/cordova-diagnostic-plugin/issues",
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova",
+    "android",
+    "ios",
+    "windows",
+    "phonegap",
+    "diagnostic",
+    "wifi",
+    "location",
+    "gps",
+    "camera",
+    "bluetooth",
+    "settings"
+  ],
+  "license": "MIT",
+  "name": "cordova.plugins.diagnostic",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dpa99c/cordova-diagnostic-plugin.git"
+  },
+  "scripts": {
+    "postinstall": "node ./scripts/apply-modules.js"
+  },
+  "types": "./cordova.plugins.diagnostic.d.ts",
+  "version": "4.0.11"
+}

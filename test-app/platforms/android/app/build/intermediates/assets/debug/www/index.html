@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src * data: blob: gap: cdvfile: tel:; img-src 'self' cdvfile: data: blob: gap: tel:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+<meta charset="utf-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=medium-dpi" />
+	
+<link rel="stylesheet" type="text/css" href="css/index.css" />
+	
+<title>Camera Test</title>
+<script src="js/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="js/common.js" type="text/javascript"></script>
+<script src="js/common-phonegap.js" type="text/javascript"></script>
+
+
+<!--<script src="cordova.js" type="text/javascript"></script>-->
+<script type="text/javascript" src="js/index.js"></script>
+</head>
+<body>
+<div class="app">
+  <h1>CAMERA TEST</h1>
+<p id="status">CONNECTING TO DEVICE</p>
+	
+  <div id="deviceready" style="display:none;">
+    <button onClick="capturePhoto();">Take Photo</button>
+  </div>
+	
+  <div id="debug"> </div>
+</div>
+<div id="container-camera-test"></div>
+
+<!-- SCRIPTS: Internal --> 
+<script type="text/javascript" src="js/globals.js"></script> 
+	
+<!-- SCRIPTS: Internal Modules -->
+<script type="text/javascript" src="modules/file-api.js"></script>
+
+<!-- SCRIPTS: Initialization--> 
+<script type="text/javascript" src="cordova.js"></script> 
+<script type="text/javascript" src="js/init.js"></script>
+</body>
+</html>
