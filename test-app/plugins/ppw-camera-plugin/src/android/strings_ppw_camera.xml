@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="flash_auto_icon">\ue000</string>
+    <string name="camera_icon">\ue004</string>
+    <string name="close_icon">\ue002</string>
+    <string name="flash_on_icon">\ue001</string>
+    <string name="flash_off_icon">\ue003</string>
+</resources>

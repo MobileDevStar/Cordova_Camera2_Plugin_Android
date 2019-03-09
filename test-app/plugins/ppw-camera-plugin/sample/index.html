@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>Hello World</title>
+    </head>
+    <body>
+        <div id="photoImg"></div>
+        <div class="app">
+            <h1>PhoneGap</h1>
+            <button id="openPPWCameraBtn">Open PPW Camera</button>
+            <p>
+                shutter sound toggle: <button id="shutterSoundBtn">off</button>
+            </p>
+            <p>
+                flashtype: <button id="flashTypeBtn">off</button>
+            </p>
+            <p>
+                auto close in 5 sec: <button id="autoCloseBtn">off</button>
+            </p>
+            <p>
+                auto confirm picture: <button id="autoConfirmBtn">on</button>
+            </p>
+            <script src="js/ppw_camera.js"></script>
+            <script>
+            document.getElementById("flashTypeBtn").addEventListener("click", function() {
+                var text = document.getElementById("flashTypeBtn").innerHTML;
+                if (text == "auto") { //cycle through options
+                    text = "torch";
+                }
+                else if (text == "torch") {
+                    text = "on";
+                }
+                else if (text == "on") {
+                    text = "off";
+                }
+                else {
+                    text = "auto";
+                }
+                document.getElementById("flashTypeBtn").innerHTML = text;
+            }, false);
+            document.getElementById("autoCloseBtn").addEventListener("click", function() {
+                var text = document.getElementById("autoCloseBtn").innerHTML;
+                if (text == "on") {
+                    text = "off";
+                }
+                else {
+                    text = "on";
+                }
+                document.getElementById("autoCloseBtn").innerHTML = text;
+            }, false);
+            document.getElementById("shutterSoundBtn").addEventListener("click", function() {
+                var text = document.getElementById("shutterSoundBtn").innerHTML;
+                if (text == "on") {
+                    text = "off";
+                }
+                else {
+                    text = "on";
+                }
+                document.getElementById("shutterSoundBtn").innerHTML = text;
+            }, false);
+            document.getElementById("autoConfirmBtn").addEventListener("click", function() {
+                var text = document.getElementById("autoConfirmBtn").innerHTML;
+                if (text == "on") {
+                    text = "off";
+                }
+                else {
+                    text = "on";
+                }
+                document.getElementById("autoConfirmBtn").innerHTML = text;
+            }, false);
+            document.getElementById("openPPWCameraBtn").addEventListener("click", function(){
+                if (document.getElementById("autoCloseBtn").innerHTML == "on") {
+                    setTimeout( function() {
+                        PPWCamera.closeCamera(null, function() {
+                        },
+                        function(error) {
+                            alert(error);
+                        });
+                    }, 5000);
+                }
+                var options = {
+                    quality: 80, //value from 0 to 100
+                    encodingType: 'jpg', //only jpg or png
+                    previewWidth: 1280, //camera aspect preview
+                    previewHeight: 1080,
+                    targetWidth: 640, //output target size
+                    targetHeight: 480,
+                    flashType: document.getElementById("flashTypeBtn").innerHTML, //auto, on, off, torch
+                    shutterSoundOff: document.getElementById("shutterSoundBtn").innerHTML === "off",
+                    thumbnail: 35, //0 to 100 (default to 25) //percentage of target size
+                    backNotify: true, //true or false (default to false)
+                    confirmErrorMessage: 'Error with photo taken.  Camera plugin will close.',
+                    confirmTimeInterval: 500,
+                    dateFontSize: 16,
+                    dateFormat: "yyyy:MM:dd HH:mm:ss",
+                    overlay: [
+                        {
+                            type: 'text', // Plain text (default)
+                            position: 'top center',  // Centered, also center justified
+                            value: 'WO# 1234567890',
+                            size: '12', // always in sp (scale-independant pixels)
+                            top: 8 // Vertical offset from top (also in scale-independant pixels)
+                        },
+                        {
+                            type: 'text', // Plain text (default)
+                            position: 'bottom left', // Left justified text
+                            value: '640x480',
+                            size: '10',
+                            left: 4, // Horizontal offset from left
+                            bottom: 4 // Vertical offset from bottom
+                        },
+                        {
+                            id: 'stage',
+                            type: 'carousel', // Carousel input / or dropdown
+                            position: 'top center', // Centered, also center justified
+                            value: ['Before', 'During', 'After'], // Send value back with return object
+                            initial: 'During',
+                            size: '12',
+                            top: 20 // Vertical offset from top
+                        }
+                    ]
+                };
+                PPWCamera.getPicture(options,function(output){
+                    var image = document.createElement("img");
+                    image.setAttribute("src", output.imageURI);
+                    document.getElementById("photoImg").appendChild(image);
+                    if (output.imageThumbURI.length > 0) {
+                        var imageThumb = document.createElement("img");
+                        imageThumb.setAttribute("src", output.imageThumbURI);
+                        document.getElementById("photoImg").appendChild(imageThumb);
+                    }
+                    document.getElementById("flashTypeBtn").innerHTML = output.flashType;
+                    if (document.getElementById("autoConfirmBtn").innerHTML == "on") {
+                        PPWCamera.confirmPicture(null, function() {
+                            test: 'does not need a parameter but using one for placeholder'
+                        },
+                        function(error) {
+                            alert(error);
+                        });
+                    }
+                    function getFileErrorMessage(err) {
+                        console.log("||FileClient.getFileErrorMessage||");
+                        var ret = "";
+                 
+                        switch (err.code) {
+                            case FileError.NOT_FOUND_ERR:
+                                ret = "Not Found Error";
+                                break;
+                            case FileError.SECURITY_ERR:
+                                ret = "Security Error";
+                                break;
+                            case FileError.ABORT_ERR:
+                                ret = "Abort Error";
+                                break;
+                            case FileError.NOT_READABLE_ERR:
+                                ret = "Not Readable Error";
+                                break;
+                            case FileError.ENCODING_ERR:
+                                ret = "Encoding Error";
+                                break;
+                            case FileError.NO_MODIFICATION_ALLOWED_ERR:
+                                ret = "Not Modification Allowed Error";
+                                break;
+                            case FileError.INVALID_STATE_ERR:
+                                ret = "Invalid State Error";
+                                break;
+                            case FileError.SYNTAX_ERR:
+                                ret = "Syntax Error";
+                                break;
+                            case FileError.INVALID_MODIFICATION_ERR:
+                                ret = "Invalid Modification Error";
+                                break;
+                            case FileError.QUOTA_EXCEEDED_ERR:
+                                ret = "Quota Exceeded Error";
+                                break;
+                            case FileError.TYPE_MISMATCH_ERR:
+                                ret = "Type Mismatch Error";
+                                break;
+                            case FileError.PATH_EXISTS_ERR:
+                                ret = "Path Exists Error";
+                                break;
+                            case "null":
+                                ret = "Null Error";
+                                break;
+                            default:
+                                ret = "Undefined Error";
+                        }
+                 
+                        ret = "Error: code " + err.code + " (" + ret + ")";
+                 
+                        return ret;
+                    }; 
+                    var localDir = navigator.userAgent.match(/Android/) ? cordova.file.dataDirectory : cordova.file.cacheDirectory;
+                    window.resolveLocalFileSystemURL(localDir,function(dirEntry) {
+                        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSys) { 
+                            dirEntry.getFile(output.lastModifiedDate+'.'+output.type, {create: false, exclusive: false}, function(fileEntry) {
+                                window.resolveLocalFileSystemURL(fileSys.root.toURL(), function(storageEntry) {
+                                    fileEntry.copyTo(storageEntry);
+                                }, function(error) {
+                                    alert(getFileErrorMessage(error));
+                                });
+                            }, function(error) {
+                                alert(getFileErrorMessage(error));
+                            }); 
+                        }, function(error) {
+                            alert(getFileErrorMessage(error));
+                        }); 
+                    }, function(error) {
+                        alert(getFileErrorMessage(error));
+                    });
+                },
+                function(error){
+                    alert(error.message);
+                });
+            }, false);
+            </script>
+            <div id="deviceready" class="blink">
+                <p class="event listening">Connecting to Device</p>
+                <p class="event received">Device is Ready</p>
+            </div>
+        </div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+    </body>
+</html>
