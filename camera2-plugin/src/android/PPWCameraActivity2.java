@@ -34,6 +34,7 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
+import android.hardware.camera2.params.MeteringRectangle;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.location.Location;
 import android.location.LocationListener;
@@ -344,10 +345,6 @@ public class PPWCameraActivity2 extends Activity {
                                         
                     if (mBackNotify) {
                         PPWCamera.sendError("close button clicked", 1, PPWCamera.openCameraCallbackContext);
-                    } else {
-                        if (callbackOutput != null) {
-                            PPWCamera.openCameraCallbackContext.success(callbackOutput);
-                        }
                     }
                 }
             });
@@ -609,6 +606,7 @@ public class PPWCameraActivity2 extends Activity {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
+            sendError();
             finish();
         }
 
@@ -1069,8 +1067,28 @@ public class PPWCameraActivity2 extends Activity {
                 }
                 finger_spacing = current_finger_spacing;
             } else {
-                if (action == MotionEvent.ACTION_UP) {
+                if (action == MotionEvent.ACTION_DOWN) {
                     //single touch logic
+                    float positionX = (int) event.getX();
+                    float positionY = (int) event.getY();
+
+                    //Build the Rectangle, where the focus should be applied.
+                    final MeteringRectangle[] meterRecArray = calculateFocusRect(event.getX(), event.getY());
+
+                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
+
+                    //Set a captureRequest to cancel focus.
+                    try {
+                        mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback, mBackgroundHandler);
+                        mState = STATE_PREVIEW;
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                    //Set the focusRegion.
+                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_REGIONS, meterRecArray);
+                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_REGIONS, meterRecArray);
+                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                 }
             }
 
@@ -1093,6 +1111,32 @@ public class PPWCameraActivity2 extends Activity {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
+    }
+
+    //Calculate a Rectangle, where the user touched the screen.
+    private MeteringRectangle[] calculateFocusRect(float x, float y) {
+        //Size of the Rectangle.
+        int areaSize = 200;
+
+        int left = clamp((int) x - areaSize / 2, 0, mTextureView.getWidth() - areaSize);
+        int top = clamp((int) y - areaSize / 2, 0, mTextureView.getHeight() - areaSize);
+
+        RectF rectF = new RectF(left, top, left + areaSize, top + areaSize);
+        Rect focusRect = new Rect(Math.round(rectF.left), Math.round(rectF.top), Math.round(rectF.right), Math.round(rectF.bottom));
+        MeteringRectangle meteringRectangle = new MeteringRectangle(focusRect, 1);
+
+        return new MeteringRectangle[] {meteringRectangle};
+    }
+
+    //Clamp the inputs.
+    private int clamp(int x, int min, int max) {
+        if (x > max) {
+            return max;
+        }
+        if (x < min) {
+            return min;
+        }
+        return x;
     }
 
     /**
@@ -1687,6 +1731,29 @@ public class PPWCameraActivity2 extends Activity {
         }
     }
 
+
+    public void confirmCamera() {
+        mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
+    }
+
+    private Runnable showConfirmErrorPopup = new Runnable() {
+        @Override
+        public void run() {
+            new AlertDialog.Builder(PPWCameraActivity2.this)
+                    .setTitle("Error")
+                    .setMessage(mConfirmErrorMessage)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setCancelable(false)
+                    .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            PPWCameraActivity2.this.finish();
+                        }
+                    })
+                    .show();
+        }
+    };
+
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
      */
@@ -1792,14 +1859,7 @@ public class PPWCameraActivity2 extends Activity {
                         return image;
                     }
 
-                    Log.d(TAG, callbackOutput.toString());
-                    // PluginResult result = new PluginResult(PluginResult.Status.OK, output);
-                    // result.setKeepCallback(true);
-                    // PPWCamera.openCameraCallbackContext.sendPluginResult(result);
-/*
-                    //start timer to check for confirmation
-                    mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
-                    mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);*/
+
                 }
 
             } catch (Exception e) {
@@ -1825,6 +1885,16 @@ public class PPWCameraActivity2 extends Activity {
                 Bitmap thumb = ThumbnailUtils.extractThumbnail(image, radius, radius);
                 thumbButton.setImageBitmap(getCircleBitmap(thumb));
                 thumbButton.setVisibility(View.VISIBLE);
+
+
+                Log.d(TAG, callbackOutput.toString());
+                PluginResult result = new PluginResult(PluginResult.Status.OK, callbackOutput);
+                result.setKeepCallback(true);
+                PPWCamera.openCameraCallbackContext.sendPluginResult(result);
+
+                //start timer to check for confirmation
+                mConfirmationTimer.removeCallbacks(showConfirmErrorPopup);
+                mConfirmationTimer.postDelayed(showConfirmErrorPopup, (long)mConfirmationTimeInterval);
             }
             //  mTakePictureMutex = true;
         }
@@ -1848,6 +1918,7 @@ public class PPWCameraActivity2 extends Activity {
         }
 
     }
+
 }
 
 

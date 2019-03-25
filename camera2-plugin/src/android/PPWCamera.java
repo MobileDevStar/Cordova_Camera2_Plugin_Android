@@ -109,6 +109,7 @@ public class PPWCamera extends CordovaPlugin {
         if (action.compareToIgnoreCase(ACTION_CONFIRM_CAMERA) == 0) {
             PPWCameraActivity2 a = PPWCameraActivity2.getInstance();
             if (a != null) {
+                a.confirmCamera();
                 return true;
             }
             sendError("Camera could not be confirmed. Camera activity is not available", 0, callback);
